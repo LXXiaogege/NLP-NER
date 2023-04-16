@@ -5,6 +5,7 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 import pickle
 import os
+from transformers import AutoTokenizer
 
 """
 中文分词，基于字标注：
@@ -20,6 +21,9 @@ tag2id = {'': 0,  # padding字对应的tag : 0
 
 id2tag = {0: '', 1: 'B_ns', 2: 'B_nr', 3: 'B_nt', 4: 'M_nt', 5: 'M_nr', 6: 'M_ns', 7: 'E_nt', 8: 'E_nr', 9: 'E_ns',
           10: 'o'}
+
+use_bert = True
+tokenizer = AutoTokenizer.from_pretrained("bert-base-chinese")
 
 
 def wordtag():
@@ -111,10 +115,17 @@ def construct_vocab():
 
 def X_padding(words):
     """把 words 转为 id 形式，并自动补全位 max_len 长度。"""
-    ids = list(word2id[words])
-    if len(ids) >= max_len:  # 长则弃掉
-        return ids[:max_len]
-    ids.extend([0] * (max_len - len(ids)))  # 短则补全
+    if use_bert:
+        sentence = ''
+        for i in words:
+            sentence = sentence + i
+        ids = tokenizer.encode(sentence, padding='max_length', truncation=True, max_length=50, return_tensors='pt')[0]
+        ids = ids.tolist()
+    else:
+        ids = list(word2id[words])
+        if len(ids) >= max_len:  # 长则弃掉
+            return ids[:max_len]
+        ids.extend([0] * (max_len - len(ids)))  # 短则补全
     return ids
 
 
