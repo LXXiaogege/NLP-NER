@@ -15,7 +15,7 @@ O | 单字
 B 表示一个词的开始，E 表示一个词的结尾，M 表示词中间的字。
 """
 
-tag2id = {'': 0,  # padding字对应的tag
+tag2id = {'': 0,  # padding字对应的tag : 0
           'B_ns': 1, 'B_nr': 2, 'B_nt': 3, 'M_nt': 4, 'M_nr': 5, 'M_ns': 6, 'E_nt': 7, 'E_nr': 8, 'E_ns': 9, 'o': 10}
 
 id2tag = {0: '', 1: 'B_ns', 2: 'B_nr', 3: 'B_nt', 4: 'M_nt', 5: 'M_nr', 6: 'M_ns', 7: 'E_nt', 8: 'E_nr', 9: 'E_ns',

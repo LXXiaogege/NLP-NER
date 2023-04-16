@@ -1,3 +1,4 @@
+import os
 import pickle
 from models.BiLSTM_CRF import bilstm_crf
 from torch.utils.data import DataLoader
@@ -8,7 +9,8 @@ from torchcrf import CRF
 import torch
 from sklearn.metrics import classification_report
 
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+os.environ['CUDA_VISIBLE_DEVICES'] = '1'
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 with open('../data/MSRA/preprocessed/MSRA.pkl', 'rb') as inp:
     word2id = pickle.load(inp)
@@ -23,7 +25,7 @@ with open('../data/MSRA/preprocessed/MSRA.pkl', 'rb') as inp:
     y_valid = pickle.load(inp)
 
 # 初始化模型
-vocab_size = len(word2id)
+vocab_size = len(word2id) + 1
 num_labels = len(tag2id)
 embed_dim = 100
 lstm_hidden_size = 200
@@ -38,7 +40,7 @@ test_dataset = MSRA(x_test, y_test)
 test_dataloader = DataLoader(dataset=test_dataset, batch_size=32, shuffle=True, drop_last=True)
 
 # 定义训练参数
-epochs = 30
+epochs = 10
 lr = 0.001
 criterion = nn.BCELoss()
 optimizer = Adam(model.parameters(), lr=lr)
@@ -59,7 +61,7 @@ for i in range(epochs):
             print('batch: ' + str(idx + 1) + ' loss: ', loss.item())
 
     # val evaluate for every epoch
-    print("epoch "+str(i)+" evaluate")
+    print("epoch " + str(i) + " evaluate")
     model.eval()
     pred_list, true_list = [], []
     for idx, (x, y) in enumerate(val_dataloader):
@@ -74,7 +76,6 @@ for i in range(epochs):
     target_names = ['B_ns', 'B_nr', 'B_nt', 'M_nt', 'M_nr', 'M_ns', 'E_nt', 'E_nr', 'E_ns', 'o']
     report = classification_report(y_true=true_list, y_pred=pred_list, target_names=target_names)
     print(report)
-
 
 print("save model")
 torch.save(model, '../checkpoint/bi_lstm-crf.pt')  # 保存整个模型
