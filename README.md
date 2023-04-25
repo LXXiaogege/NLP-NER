@@ -3,8 +3,6 @@
 > 基于深度学习的命名实体识别任务学习。目前有BiLstm-CRF和BERT-BiLstm-CRF模型
 
 
-One to two paragraph statement about your product and what it does.
-
 ![](header.png)
 
 ## Installation
